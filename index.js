@@ -1,6 +1,7 @@
-const { Client, Collection, IntentsBitField } = require('discord.js');
+const { Client, Collection, Partials, ActivityType, IntentsBitField } = require('discord.js');
 const readline = require('readline');
 const fs = require('fs');
+var colors = require('colors');
 require('dotenv').config();
 
 const client = new Client({
@@ -9,6 +10,20 @@ const client = new Client({
         IntentsBitField.Flags.GuildMembers,
         IntentsBitField.Flags.GuildMessages,
     ],
+    partials: [
+        Partials.Message,
+        Partials.Channel,
+        Partials.Reaction,
+        Partials.GuildMember,
+        Partials.User,
+    ]
+});
+
+module.exports = client;
+
+// Load the handlers
+fs.readdirSync(`./handlers`).forEach((handler) => {
+    require(`./handlers/${handler}`)(client);
 });
 
 // Function to prompt user for bot token
@@ -47,7 +62,3 @@ if (process.argv[2]) {
     console.log("Note: We recommended you provide the bot token into the .env file (DISCORD_TOKEN) for the long run.");
     promptForToken();
 };
-
-client.once('ready', () => {
-    console.log(`${client.user.tag} is now logged in and ready to be used!`);
-});
